@@ -131,10 +131,10 @@ def pre_process_data(raw_DF):
     cor = Numeric_DF.corr()
     #print("Printing cor")
     #print(cor)
-    """#Visualisation things
+    #Visualisation things
     plt.figure(figsize=(12,10))
     sns.heatmap(cor, annot=True, cmap=plt.cm.Reds)
-    plt.show()"""
+    plt.show()
 
     #Now we select the correlation between which two things is needed.
     #first we do correlation between each feature and target
@@ -159,7 +159,8 @@ def pre_process_data(raw_DF):
     nclmn = len(attributes)
     n = int((nclmn + 1)/2)
     #create a set in python to hold all the final selected numeric attributes
-    final_Numeric_attr = set()
+    #final_Numeric_attr = set()
+    attr_list_to_remove = set()
     #TODO: Use Hash tables to optimize this
     for i in range(0,n):
         cor2_attr = abs(cor2[attributes[i]])
@@ -169,9 +170,16 @@ def pre_process_data(raw_DF):
         
         #Extract the target corr of all the matching attributes
         target_corr = relevant_features_with_cor[matching_attr]
-        
-        final_Numeric_attr.add(target_corr.idxmax())
-    final_Numeric_DF = numeric_df_reduced[final_Numeric_attr]
+        #actually this is not the right way. We need find the attributes which should be dropped instead of finding which ones to select.
+        #final_Numeric_attr.add(target_corr.idxmax())
+        while (len(matching_attr) > 1):
+            #find the attribute which has minimum corr with target
+            attr_to_remove = target_corr.idxmin()
+            matching_attr.remove(attr_to_remove)
+            attr_list_to_remove.add(attr_to_remove)
+    print("To be removed" + str(attr_to_remove))
+    final_Numeric_DF = numeric_df_reduced.drop(attr_list_to_remove, axis = 1)
+    #final_Numeric_DF = numeric_df_reduced[final_Numeric_attr]
 
     #combine Numerical attributes and Nominal Attributes
     Preprocessed_DF_X = pd.concat([final_Numeric_DF, nominal_df_reduced], axis=1)
@@ -213,6 +221,7 @@ if __name__ == "__main__":
 
     #pre_processed_df = pre_process_data(data)
     decision_tree = train_classifier(Preprocessed_DF_X, y)
+    print(Preprocessed_DF_X)
     features = list(Preprocessed_DF_X)
     plot_decision_tree(decision_tree, features)
 
