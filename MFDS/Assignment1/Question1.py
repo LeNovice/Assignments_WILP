@@ -32,8 +32,8 @@ def ret_sigbit(x,dimension=0):
           sys.exit("EXCEPTION in ret_sigbit" + str(x[i]))
     return x
   elif dimension == 2:
-    col = len(mat[0,:])
-    row = len(mat[:,0])
+    col = len(x[0,:])
+    row = len(x[:,0])
     for i in range(row):
       for j in range(col):
         try:
